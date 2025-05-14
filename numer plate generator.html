@@ -1,0 +1,244 @@
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Number Plate Generator Mini Project</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #e0eafc, #cfdef3);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 30px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      color: #222;
+    }
+    .container {
+      background: white;
+      max-width: 420px;
+      width: 100%;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      padding: 30px 25px 40px 25px;
+      user-select: none;
+    }
+    h1 {
+      font-weight: 700;
+      color: #30475e;
+      margin-top: 0;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    p.desc {
+      font-size: 14px;
+      color: #607d8b;
+      margin-top: 0;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #455a64;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: 2px solid #78909c;
+      margin-bottom: 25px;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #1565c0;
+      background: #f0f7ff;
+    }
+    .error-message {
+      color: #d32f2f;
+      font-size: 13px;
+      margin-top: -20px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      text-align: center;
+    }
+    label.color-label {
+      margin-bottom: 5px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #455a64;
+    }
+    select {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 2px solid #78909c;
+      margin-bottom: 30px;
+      box-sizing: border-box;
+      cursor: pointer;
+      background: white;
+      transition: border-color 0.3s ease;
+    }
+    select:focus {
+      outline: none;
+      border-color: #1565c0;
+      background: #f0f7ff;
+    }
+    .number-plate {
+      width: 100%;
+      height: 100px;
+      border-radius: 12px;
+      border: 4px solid #222;
+      background-color: #fff;
+      color: #222;
+      font-weight: 900;
+      font-size: 48px;
+      letter-spacing: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-transform: uppercase;
+      user-select: text;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+    }
+    .footer {
+      margin-top: 35px;
+      font-size: 12px;
+      color: #78909c;
+      text-align: center;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <main class="container" role="main" aria-label="Number Plate Generator Mini Project">
+    <h1>Number Plate Generator</h1>
+    <p class="desc">Enter your vehicle number plate and customize the style!</p>
+
+    <form id="plate-form" novalidate>
+      <label for="plate-input">Enter Number Plate</label>
+      <input
+        type="text"
+        id="plate-input"
+        maxlength="15"
+        autocomplete="off"
+        name="plate"
+        placeholder="e.g. KA01AB1234"
+        aria-describedby="plate-error"
+        aria-required="true"
+        aria-invalid="false"
+        spellcheck="false"
+      />
+      <div id="plate-error" class="error-message" role="alert" aria-live="assertive"></div>
+
+      <label for="color-select" class="color-label">Select Plate Color</label>
+      <select id="color-select" aria-label="Select number plate color">
+        <option value="white" selected>White (Standard)</option>
+        <option value="yellow">Yellow (Commercial)</option>
+        <option value="black">Black (Special)</option>
+      </select>
+    </form>
+
+    <div id="plate-display" class="number-plate" aria-live="polite" aria-atomic="true" tabindex="0" role="textbox" aria-readonly="true" aria-label="Displayed number plate"></div>
+
+    <div class="footer">
+      &copy; 2024 Number Plate Mini Project
+    </div>
+  </main>
+
+  <script>
+    (function(){
+      const plateInput = document.getElementById('plate-input');
+      const plateDisplay = document.getElementById('plate-display');
+      const colorSelect = document.getElementById('color-select');
+      const errorDiv = document.getElementById('plate-error');
+
+      // Basic Indian vehicle number plate regex format (very simplified)
+      const plateRegex = /^[A-Z]{2}\d{1,2}[A-Z]{1,2}\d{4}$/;
+
+      function updatePlateDisplay() {
+        const val = plateInput.value.toUpperCase().trim();
+
+        // Validate input
+        if(val.length === 0) {
+          plateDisplay.textContent = '';
+          errorDiv.textContent = '';
+          plateInput.setAttribute('aria-invalid', 'false');
+          return;
+        }
+
+        if(!plateRegex.test(val)){
+          errorDiv.textContent = 'Invalid number plate format. Example: KA01AB1234';
+          plateInput.setAttribute('aria-invalid', 'true');
+          plateDisplay.textContent = '';
+          return;
+        }
+
+        // Valid plate
+        errorDiv.textContent = '';
+        plateInput.setAttribute('aria-invalid', 'false');
+        plateDisplay.textContent = val;
+      }
+
+      function updatePlateColor() {
+        const color = colorSelect.value;
+
+        switch(color) {
+          case 'white':
+            plateDisplay.style.backgroundColor = '#fff';
+            plateDisplay.style.color = '#222';
+            plateDisplay.style.borderColor = '#222';
+            break;
+          case 'yellow':
+            plateDisplay.style.backgroundColor = '#ffeb3b';
+            plateDisplay.style.color = '#000';
+            plateDisplay.style.borderColor = '#000';
+            break;
+          case 'black':
+            plateDisplay.style.backgroundColor = '#222';
+            plateDisplay.style.color = '#fff';
+            plateDisplay.style.borderColor = '#fff';
+            break;
+```
+ case 'green':
+            plateDisplay.style.backgroundColor = '#222';
+            plateDisplay.style.color = '#fff';
+            plateDisplay.style.borderColor = '#fff';
+            break;
+```
+          default:
+            plateDisplay.style.backgroundColor = '#fff';
+            plateDisplay.style.color = '#222';
+            plateDisplay.style.borderColor = '#222';
+        }
+      }
+
+      plateInput.addEventListener('input', updatePlateDisplay);
+      colorSelect.addEventListener('change', updatePlateColor);
+
+      // Initialize display
+      updatePlateColor();
+    })();
+  </script>
+</body>
+</html>
+```
+
+You can open this ```
+number-plate.html
+```
+
+ file in any modern browser. Enter a vehicle number plate in the input (example: KA01AB1234), it will validate the plate roughly and show a stylized number plate below. You can also select different plate colors (white, yellow, black) to simulate different types of number plates.
+
+Let me know if you want me to add more features or customi
